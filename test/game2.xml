@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?><items termsofuse="http://boardgamegeek.com/xmlapi/termsofuse"><item type="boardgame" id="145654">
+         <thumbnail>//cf.geekdo-images.com/images/pic1740801_t.jpg</thumbnail>
+      <image>//cf.geekdo-images.com/images/pic1740801.jpg</image>
+                                     				
+				<name type="primary" sortindex="1" value="Invaders" />
+			
+						                           
+						               													<description>Earth is in mortal danger!&amp;#10;&amp;#10;Invaders is a card-driven board game of warfare and horror featuring asymmetrical game-play for two players. In the game, the players take on the roles of commanding forces on opposite sides of the conflict.&amp;#10;&amp;#10;One player leads the extraterrestrial conquerors whose goal is to transform the Earth and subjugate its inhabitants. The Invaders possess unthinkable weapons and unknowable technologies. More so, within their galactic armada the aliens hold bound a terrifying array of eldritch creatures engineered specifically to sow the chaos and destruction that heralds the arrival of their masters.&amp;#10;&amp;#10;The other player commands the unyielding forces of a united Earth. In the shadow of a planet-wide scourge, the nations of the Earth have joined forces to confront the arrival of a doom spawned on the other side of the galaxy. The Terran alliance is a desperation-forged bulwark upon which the invading forces crash and are repelled time and again. Outgunned, with salvaged or untested technology and one foot in the grave, the determined network of military machinery, elite strike-teams, warfare scientists, and neighborhood militias are surprisingly capable of bloodying the Invaders' noses whenever the two forces meet.&amp;#10;&amp;#10;The eponymous Invaders seek to destroy the forces defending the Earth and exhaust their reserves. They do this by defeating the defending forces at key locations while also causing the Earth player to disrupt cards from their deck to their discard pile. The Invader must be cunning when deploying their creatures and war-machines, or enacting their schemes, as the cost to bring assets into the war often involves the discarding of other assets.&amp;#10;&amp;#10;Mankind must work desperately to defend critical resources and locations from the corruption and incursion of the alien threat. They do this by building formidable and deadly defenses, predicting where the alien player will strike and setting traps designed to deprive the Invaders of key units and wear-down their options. Like the Invader, the humans need to be clever in what they deploy and how they deploy it because their heroes may be bold but they are small in number, and the Invaders are inexorable.&amp;#10;&amp;#10;Invaders is a science-fiction game piled thick with the trappings of war and horror. It is steeped in difficult decisions, but built upon a simple, elegant set of rules, and because of this, you will find each game telling a slightly different story each time you play. Both sides use cards to represent their units, plans, resources and events, but as this is an asymmetrical battle game, the way in which those cards are played and how they forward their owner's goals are very different. Regardless, knowing when to let an asset go in favor of a better one, how to exploit a weakness in your enemy's ranks, and where to press an advantage or feint a trap will be key in seeing your side emerge as the victor from the morass of galactic war.&amp;#10;&amp;#10;One question remains: Which side are YOU on?&amp;#10;&amp;#10;</description>
+										      	               				<yearpublished value="2013" />
+						               				<minplayers value="2" />
+						               				<maxplayers value="2" />
+						      			<poll name="suggested_numplayers" title="User Suggested Number of Players" totalvotes="4">
+			
+		<results numplayers="1">		
+					<result value="Best" numvotes="0" />
+					<result value="Recommended" numvotes="0" />
+					<result value="Not Recommended" numvotes="2" />
+				</results>					
+			
+		<results numplayers="2">		
+					<result value="Best" numvotes="4" />
+					<result value="Recommended" numvotes="0" />
+					<result value="Not Recommended" numvotes="0" />
+				</results>					
+			
+		<results numplayers="2+">		
+					<result value="Best" numvotes="0" />
+					<result value="Recommended" numvotes="0" />
+					<result value="Not Recommended" numvotes="2" />
+				</results>					
+	</poll> 
+			               				<playingtime value="60" />
+						               				<minplaytime value="60" />
+						               				<maxplaytime value="60" />
+						               				<minage value="12" />
+						      			<poll name="suggested_playerage" title="User Suggested Player Age" totalvotes="3">
+			<results>		
+					<result value="2" numvotes="0" />
+					<result value="3" numvotes="0" />
+					<result value="4" numvotes="0" />
+					<result value="5" numvotes="0" />
+					<result value="6" numvotes="0" />
+					<result value="8" numvotes="1" />
+					<result value="10" numvotes="1" />
+					<result value="12" numvotes="1" />
+					<result value="14" numvotes="0" />
+					<result value="16" numvotes="0" />
+					<result value="18" numvotes="0" />
+					<result value="21 and up" numvotes="0" />
+				</results>					
+	</poll> 
+			      			<poll name="language_dependence" title="Language Dependence" totalvotes="6">
+			
+		<results>		
+					<result level="1" value="No necessary in-game text" numvotes="0" />
+					<result level="2" value="Some necessary text - easily memorized or small crib sheet" numvotes="0" />
+					<result level="3" value="Moderate in-game text - needs crib sheet or paste ups" numvotes="1" />
+					<result level="4" value="Extensive use of text - massive conversion needed to be playable" numvotes="5" />
+					<result level="5" value="Unplayable in another language" numvotes="0" />
+				</results>					
+	</poll> 
+			      			 
+			      				
+		 			
+
+			
+		
+					<link type="boardgamecategory" id="1002" value="Card Game" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="boardgamecategory" id="1046" value="Fighting" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="boardgamecategory" id="1024" value="Horror" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="boardgamecategory" id="1016" value="Science Fiction" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="boardgamemechanic" id="2040" value="Hand Management" />
+		
+									
+				
+		 			
+
+			
+		
+					<link type="boardgamemechanic" id="2015" value="Variable Player Powers" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="boardgamefamily" id="5679" value="Aliens" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="boardgameexpansion" id="192821" value="Invaders: Armageddon" />
+		
+									
+			
+
+			      			
+
+			      			
+
+			      			
+
+			      			
+
+			      			
+
+			      			
+
+			      	      	      				
+		 			
+
+			
+		
+					<link type="boardgamedesigner" id="26628" value="Mark Chaplin" />
+		
+									
+			
+
+			      				
+		 			
+
+			
+		
+					<link type="boardgameartist" id="34490" value="Chechu Nieto" />
+		
+									
+			
+
+			      	      				
+		 			
+
+			
+		
+					<link type="boardgamepublisher" id="4932" value="White Goblin Games" />
+		
+									
+			
+
+			
+	
+
+	
+
+	
+	
+	
+   
+	
+          
+</item>
+</items>
