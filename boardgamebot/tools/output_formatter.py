@@ -13,16 +13,31 @@ from objects.answer import TelegramInlineAnswer
 
 logger = logging.getLogger("output_formatter")
 
+def _escapeHtml(text):
+    text = text.replace("&", "&amp;")
+    text = text.replace("<","&lt;")
+    text = text.replace(">", "&gt;")
+    return text
+
+def _bold(text):
+    return "<b>" + text + "</b>"
+
+def _italic(text):
+    return "<i>" + text + "</i>"
+
+def _link(link, label):
+    return "<a href=\"" + link + "\">" + label + "</a>"
+
 def _appendList(originalString, listToAppend, separator, ending):
     for elem in listToAppend:
-        originalString += elem + separator
+        originalString += _escapeHtml(elem) + separator
     offset = len(separator)
     originalString = originalString[:-offset]
     originalString += ending
     return originalString
 
 def _formatGameTitle(game):
-    s = "*" + game.name.title() + "*"
+    s = _bold(_escapeHtml(game.name.title()))
     if game.year is not None:
         s += " (" + game.year + ")"
     s += "\n"
@@ -32,15 +47,15 @@ def _formatGameInfo(game):
     s = ""
     if game.numDesigners() > 0:
         if 1 == game.numDesigners():
-            s += "_Designer:_ "
+            s += _italic("Designer: ")
         else:
-            s += "_Designers:_ "
+            s += _italic("Designers: ")
         s = _appendList(s, game.getDesigners(), ", ", ".\n")
     if game.numArtists() > 0:
         if 1 == game.numArtists():
-            s += "_Artist:_ "
+            s += _italic("Artist: ")
         else:
-            s += "_Artists:_ "
+            s += _italic("Artists: ")
         s = _appendList(s, game.getArtists(), ", ", ".\n")
     if game.average is not None:
         try:
@@ -48,36 +63,36 @@ def _formatGameInfo(game):
             if "." in rating:
                 rating = rating.rstrip("0").rstrip(".")
                 # remove decimal part if zero
-            s += "_Rating:_ " + rating + "\n"
+            s += _italic("Rating: ") + rating + "\n"
         except ValueError:
             # just skip the average, which is likely not available
             logger.info("Game average is not a number: " + game.average)
     if game.rank is not None:
-        s += "_Rank:_ " + game.rank + "\n"
+        s += _italic("Rank: ") + game.rank + "\n"
     if game.playingTime is not None and "0" != game.playingTime:
-        s += "_Playing time:_ " + game.playingTime + " minutes.\n"
+        s += _italic("Playing time: ") + game.playingTime + " minutes.\n"
     if game.minPlayers is not None:
-        s += "_Players:_ " + game.minPlayers
+        s += _italic("Players: ") + game.minPlayers
     if game.maxPlayers is not None:
         if game.minPlayers is None:
-            s += "_Players:_ " + game.maxPlayers
+            s += _italic("Players: ") + game.maxPlayers
         elif game.maxPlayers > game.minPlayers:
             s += " - " + game.maxPlayers
     return s + "\n"
 
 def _formatGameDescription(game):
     if len(game.description) > 800:
-        return game.description[:800] + "...\n"
+        return _escapeHtml(html.unescape(game.description[:800])) + "...\n"
     else:
-        return game.description + "\n"
+        return _escapeHtml(html.unescape(game.description)) + "\n"
 
 def _formatGameThumbnail(game):
     if game.thumbnail is not None:
-        return "[Cover](" + game.thumbnail + ")\n"
+        return _link(game.thumbnail, "Cover") + "\n"
     return ""
 
 def _formatGameLink(game):
-    return "[Read on BoardGameGeek.](" + game.link + ")\n"
+    return _link(game.link, "Read on BoardGameGeek.") + "\n"
 
 def _formatGameBodyLess(game):
     """Formats the body of an answer containing a game, inserting only basic info.
@@ -92,7 +107,7 @@ def _formatGameBodyLess(game):
     s += _formatGameInfo(game)
     s += _formatGameThumbnail(game)
     s += _formatGameLink(game)
-    return html.unescape(s)
+    return s
 
 def _formatGameBodyMore(game):
     """Formats the body of an answer containing a game, inserting additional info.
@@ -106,7 +121,7 @@ def _formatGameBodyMore(game):
     s = _formatGameTitle(game) + "\n"
     s += _formatGameDescription(game)
     s += _formatGameLink(game)
-    return html.unescape(s)
+    return s
 
 def _formatGameListBody(gameList):
     """Formats the body of an answer containing a game list.
@@ -123,13 +138,13 @@ def _formatGameListBody(gameList):
     count = offset + 1
     for game in itertools.islice(gameList.gameList, offset, limit):
         s += u"&#x25BA"  # Unicode symbol to indicate element in list
-        s += " /" + str(count) + "."  # element number
-        s += " *" + game.name.title() + "*"
+        s += " " + str(count) + "."  # element number
+        s += " " + _bold(_escapeHtml(game.name.title()))
         if game.year is not None:
             s += " (" + game.year + ")"
-        s += " - ID: " + game.id_ + "\n"
+        s += " - ID: /" + game.id_ + "\n"
         count += 1
-    return html.unescape(s)
+    return s
 
 def formatGame(game, more=False):
     """Formats an answer containing a game, creating the body and attaching the markup.
@@ -187,8 +202,9 @@ def formatGameList(gameList):
     if offset + constants.LIST_PAGE_SIZE < totalSize:
         entry = dict(text="Next", callback_data="ln" + callback_data)
         buttonList.append(entry)
-    keyboard.append(buttonList)
-    return TelegramAnswer(formattedGameListBody, inlineKeyboardMarkup=keyboard)
+    if buttonList:
+        keyboard.append(buttonList)
+    return TelegramAnswer(formattedGameListBody, inlineKeyboardMarkup=keyboard if keyboard else None)
 
 """Following methods format various error messages."""
 def formatNoResultFound():
@@ -198,7 +214,7 @@ def formatBggUnreachable():
     return TelegramAnswer("Sorry, it was not possible to contact Boardgamegeek servers. Try again later!")
 
 def formatCommandNotSupported(command):
-    return TelegramAnswer("Sorry, */" + command + "* is not a valid command.")
+    return TelegramAnswer("Sorry, " + _bold("/" + command) + " is not a valid command.")
 
 def formatHistoryNotFound():
     return TelegramAnswer("Sorry, last search not found in the history. Try to start a new search.")
@@ -221,12 +237,12 @@ def formatHelp():
     Returns:
         .answer.TelegramAnswer: The description of how to use this bot.
     """
-    s = "This bot brings the power of [BoardGameGeek](https://boardgamegeek.com/) into Telegram. The sky's the limit now."
-    s += "\n\n*Commands:*\n"
+    s = "This bot brings the power of " + _link("https://boardgamegeek.com/", "BoardGameGeek") + " into Telegram. The sky's the limit now."
+    s += "\n\n" + _bold("Commands:") + "\n"
     for c in constants.COMMAND_DESCRIPTIONS:
         s += c + " - " + constants.COMMAND_DESCRIPTIONS[c] + "\n"
-    s += "\n*Inline Commands:*\n"
+    s += "\n" + _bold("Inline Commands:") + "\n"
     for c in constants.INLINE_COMMAND_DESCRIPTIONS:
         s += c + " - " + constants.INLINE_COMMAND_DESCRIPTIONS[c] + "\n"
-    s += "\n For info about how inline mode works, see [the official guide](https://telegram.org/blog/inline-bots)."
+    s += "\nFor info about how inline mode works, see" + _link("https://telegram.org/blog/inline-bots", " the official guide") + "."
     return TelegramAnswer(s)

@@ -14,7 +14,7 @@ class ChatHistory():
         self.lastGameList = None
         """The most recent game list searched in a chat.
         """
-        self.recentGames = answer.TelegramInlineAnswerList(5, True)
+        self.recentGames = answer.TelegramInlineAnswerList(30, True)
         """The list of most recent games searched in a chat.
         """
         self.setMsgId = None  # function to use when setting msgId

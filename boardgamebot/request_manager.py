@@ -83,24 +83,39 @@ def _searchById(id_, chatId, more=False):
     return formattedGame
 
 # reraises BggUnreachable, NoResultFound and InvalidXmlStructure
-# It cannot be private because it is called from init_inline_default.py
-def searchByIdInline(id_, cacheTime, isPersonal):
+def _searchByIdInline(id_):
     """Searches for a game by ID and returns an inline answer.
 
     Args:
         id_ (int): The ID of the game to search.
-        cacheTime (int): The time the result should be cached on Telegram server.
-        isPersonal (bool): Whether the result should be cached only for the user that made
-            the request.
+
+    Returns:
+        answer.TelegramInlineAnswer: An object containing all the information
+            about a single entry in the list of results which is to be returned.
+    """
+    game = http.searchById(id_)
+    return output_formatter.formatInlineGame(game)
+
+# reraises BggUnreachable, NoResultFound and InvalidXmlStructure
+def _searchInlineList(searchString, httpSearch, offset):
+    """Searches for a list of games by name (exact or partial).
+
+    Args:
+        searchString (str): The (partial) name of the game.
+        httpSearch (Callable[[str],game.gameList]): The function to use to search.
+        offset (int): The offset to apply to the result list before starting to parse the results.
 
     Returns:
         answer.TelegramInlineAnswerList: An object containing all the information
-            to be sent to answer the inline query.
+            which is to be returned.
     """
-    game = http.searchById(id_)
-    formattedInlineGame = output_formatter.formatInlineGame(game)
-    inlineList = answer.TelegramInlineAnswerList(cacheTime, isPersonal)
-    inlineList.addInlineAnswer(formattedInlineGame)
+    inlineList = answer.TelegramInlineAnswerList(36000, False)
+    gameList = httpSearch(searchString)
+    lastIndex = min(offset + constants.INLINE_LIST_PAGE_SIZE, gameList.length())
+    for index in range(offset, lastIndex):
+        inlineList.addInlineAnswer(_searchByIdInline(gameList.get(index).id_))
+    if lastIndex < gameList.length():
+        inlineList.setNextOffset(str(lastIndex))
     return inlineList
 
 def _gameFromList(pos, chatId):
@@ -207,22 +222,22 @@ def processCommand(command, msg, chatId=None):
     try:
         # start and help are default telegram commands
         if "start" == command:
-            logger.info("start")
+            logger.debug("start")
             return output_formatter.formatHelp()
         elif "help" == command:
-            logger.info("help")
+            logger.debug("help")
             return output_formatter.formatHelp()
         elif "i" == command or "id" == command:
-            logger.info("id")
+            logger.debug("id")
             return _searchById(msg, chatId)
         elif "b" == command or "boardgame" == command:
-            logger.info("boardgame")
+            logger.debug("boardgame")
             return _searchByName(msg, chatId)
         elif "e" == command or "exact" == command:
-            logger.info("exact")
+            logger.debug("exact")
             return _searchByNameExact(msg, chatId)
         elif "L" == command:
-            logger.info("gameFromList")
+            logger.debug("gameFromList")
             return _gameFromList(msg, chatId)
         else:
             return output_formatter.formatCommandNotSupported(command)
@@ -265,34 +280,46 @@ def processCallback(data, chatId, msgId):
     except (exceptions.ListNavigationOutOfBound, exceptions.BadCallbackData):
         return output_formatter.formatBadCallbackData()
 
-def processInline(command, msg, userId):
+def processInline(command, msg, userId, listOffset=0):
     """Entry point of this module for inline queries.
     This is used to process user input in the form of a command string
     and a message body.
 
     Args:
-        command (str): The command to process.
-        msg (str): An optional argument to the command. May be None.
+        command (str): An optional command, used to recognize internal queries (like queries by ID).
+        msg (str): The message to process.
         userId (int): The ID of the user that sent the message.
             It is used to retrieve the user history.
+        listOffset (int): an optional offset used for pagination.
 
     Returns:
         .answer.TelegramAnswer: An answer to the message, containing the required
         info or an error message.
     """
     try:
-        if "i" == command:
-            if msg is not None:
-                logger.info("ByIdInline")
-                return searchByIdInline(msg, 3600, False)
+        if listOffset is None:
+            listOffset = 0
+
+        if command:
+            if "i" == command:
+                logger.debug("Inline query by ID")
+                inlineList = answer.TelegramInlineAnswerList(36000, False)
+                game = _searchByIdInline(msg)
+                inlineList.addInlineAnswer(game)
+                return inlineList
             else:
-                logger.error("ID is required in inline 'i' queries")
-        elif "r" == command:
-            logger.info("Inline recent games")
+                logger.error("Inline command " + command + " is not supported.")
+        elif "r" == msg:
+            logger.debug("Inline recent games")
             return history_manager.getRecentGames(userId)
-        else: # default result
-            logger.info("Inline default")
-            return constants.INLINE_DEFAULT
+        elif len(msg) < constants.INLINE_EXACT_QUERY_THRESHOLD:
+            logger.debug("Inline exact search")
+            return _searchInlineList(msg, http.searchByNameExact, listOffset)
+        else:
+            logger.debug("Inline non-exact search")
+            return _searchInlineList(msg, http.searchByName, listOffset)
+    except exceptions.NoResultFound:
+        pass # do nothing if nothing is found
     except: # in case of any problem, send default result
         logger.exception("Error in inline query.")
-        return processInline("default", None, None)
+        return constants.INLINE_DEFAULT

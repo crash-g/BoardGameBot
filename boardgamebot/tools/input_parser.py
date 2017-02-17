@@ -23,7 +23,24 @@ def parseCommand(msg):
         return (match.group(1), match.group(2))
     match = constants.QUERY_LIST_REGEXP.match(msg)
     if match:
-        return ("L", match.group(1))
+        return ("id", match.group(1))
+    else:
+        return (None, msg)
+
+def parseInlineCommand(msg):
+    """Parses an inline message.
+
+    Args:
+        msg (str): The message to parse.
+
+    Returns:
+        tuple: A tuple containing the command (or None) as first element
+        and the rest of the message as second.
+    """
+    msg = msg.strip()
+    match = constants.INLINE_ID_REGEXP.match(msg)
+    if match:
+        return ("i", match.group(1))
     else:
         return (None, msg)
 
@@ -64,22 +81,3 @@ def parseCallbackListData(data):
         return match.group(1), match.group(2), match.group(3)
     else:
         raise exceptions.BadCallbackData()
-
-def parseInlineCommand(msg):
-    """Parses an inline message.
-
-    Args:
-        msg (str): The message to parse.
-
-    Returns:
-        tuple: A tuple containing the command (or None) as first element
-        and the rest of the message as second.
-
-    :todo: throw exception if message is malformed.
-    """
-    msg = msg.strip()
-    match = constants.INLINE_QUERY_REGEXP.match(msg)
-    if match:
-        return (match.group(1), match.group(2))
-    else:
-        return (None, msg)

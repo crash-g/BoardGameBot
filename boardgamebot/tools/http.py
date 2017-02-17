@@ -24,6 +24,7 @@ def _sendAPI2Req(requestType, payload):
     """
     path = constants.DEFAULT_API_PATH + requestType
     try:
+        # TODO controlla cosa succede con query con caratteri speciali
         r = requests.get(path, params=payload, timeout=constants.DEFAULT_REQUEST_TIMEOUT)
         logger.debug(r.url)
         logger.debug(r.status_code)

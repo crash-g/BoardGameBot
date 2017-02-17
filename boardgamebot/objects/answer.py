@@ -93,6 +93,8 @@ class TelegramInlineAnswerList(Answer):
             self.answerList = []
         else:
             self.answerList = answerList
+        self.nextOffset = ""
+        # the value of the next_offset parameter, used to support pagination
 
     def addInlineAnswer(self, answer):
         self.answerList.append(answer)
@@ -105,3 +107,6 @@ class TelegramInlineAnswerList(Answer):
 
     def size(self):
         return len(self.answerList)
+
+    def setNextOffset(self, offset):
+        self.nextOffset = offset

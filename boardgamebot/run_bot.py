@@ -2,9 +2,11 @@
 """
 import sys
 import asyncio
+import aiohttp
 import threading
 import logging
 import signal
+import telepot
 
 import init_log
 # the init_log must be the first import in order to initialize the log for all modules
@@ -27,6 +29,14 @@ if __name__ == "__main__":
     logger = logging.getLogger("run_bot")
 
     TOKEN = sys.argv[1]  # get token from command-line
+
+    # set proxy
+    if(constants.botProxy is not None):
+        telepot.aio.api._pools = {
+            'default': aiohttp.ProxyConnector(proxy=constants.botProxy, force_close=False, limit=10)
+        }
+        telepot.aio.api._timeout = 300
+        telepot.aio.api._onetime_pool_spec = (aiohttp.ProxyConnector, dict(proxy=constants.botProxy, force_close=True))
 
     bot = asyncbot.BggBot(TOKEN)
     loop = asyncio.get_event_loop()

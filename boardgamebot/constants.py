@@ -7,6 +7,8 @@ from collections import OrderedDict
 botUsername = "BoardGameTestBot"
 botName = "BoardGameTestBot"
 """Default bot name, it is set at startup using Telegram API."""
+botProxy = None
+"""Proxy for telepot. Set as None if no proxy is needed."""
 
 # LOG
 logfileName = "log/logfile_" + str(datetime.date.today()) + ".log"
@@ -24,29 +26,26 @@ BOARDGAMEGEEK_BASE_ADDRESS = r"https://www.boardgamegeek.com/boardgame/"
 COMMAND_DESCRIPTIONS = OrderedDict([
             ("/b", "Search for a boardgame by name and returns a list of matches."),
             ("/e", "Same as the previous one, but only returns exact matches."),
-            ("/n", "Get info about the n-th boardgame in a list. EXAMPLE: /12 looks for the 12-th result. RESTRICTION: Only works with the most recent list search."),
-            ("/i", "Search for a boardgame by ID and returns game info."),
             ("/help", "Print this help.")
         ])
 """A description of the bot normal commands, to display to users."""
 
 INLINE_COMMAND_DESCRIPTIONS = OrderedDict([
-    ("r", "Returns the list of the most recent boardgames found chatting with the bot in the private chat."),
-    ("i", "Search for a boardgame by ID and returns game info.")
+    ("game name", "Search for a boardgame by its name and returns game info."),
+    ("r", "Returns the list of the most recent boardgames found chatting with the bot in the private chat.")
 ])
 """A description of the bot inline commands, to display to users."""
 
 # INPUT
 def defineREGEXPs():
-    # Postpones REGEXPs definition until later, when botUsername and botName will be know
+    # Postpones REGEXPs definition until later, when botUsername and botName will be known
     global COMMAND_REGEXP
     global ARGUMENT_REGEXP
     global QUERY_REGEXP
     global CALLBACK_DATA_SEPARATOR
     global CALLBACK_GAME_DATA
     global CALLBACK_LIST_DATA
-    global INLINE_COMMAND_REGEXP
-    global INLINE_QUERY_REGEXP    
+    global INLINE_ID_REGEXP
     global QUERY_LIST_REGEXP
 
     COMMAND_REGEXP = r"^\/([a-zA-Z]+)(?:@(?:" + re.escape(botUsername) + "|" + re.escape(botName) + "))?"
@@ -57,8 +56,7 @@ def defineREGEXPs():
     CALLBACK_GAME_DATA = re.compile(r"^(l|m)([0-9]+)$")
     CALLBACK_LIST_DATA = re.compile(r"^(p|n)(.*)" + CALLBACK_DATA_SEPARATOR + r"([0-9]+)$")
 
-    INLINE_COMMAND_REGEXP = r"(?:\/)?([a-z])"
-    INLINE_QUERY_REGEXP = re.compile(INLINE_COMMAND_REGEXP + ARGUMENT_REGEXP)
+    INLINE_ID_REGEXP = re.compile(r"i ([0-9]+)")
 
     QUERY_LIST_REGEXP = re.compile(r"^\/([0-9]+)(?:@" + botName + ")?$")
 
@@ -69,6 +67,7 @@ BGG_TYPES = ["g", "l"]
 # ANSWER
 LIST_SIZE_LIMIT=150
 LIST_PAGE_SIZE = 10
+INLINE_LIST_PAGE_SIZE = 4
 MARKUP_KEYBOARD_ROW_LENGTH = 3
 ANSWER_METHOD_TYPES = ["n", "c", "i", "e"]
 """Types of :class:`.objects.answer.Answer`. This must contain the same keys which are in
@@ -84,5 +83,7 @@ HISTORY_WARNING_SIZE = 268435456
 """Size in byte of the history after which a warning will be produced."""
 
 # INLINE
+INLINE_EXACT_QUERY_THRESHOLD = 5
+"""The minimum number of characters required to trigger a query by _partial_ name"""
 INLINE_DEFAULT_PATH = "resources/inline_default.dat"
 INLINE_DEFAULT = None

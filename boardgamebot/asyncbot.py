@@ -10,7 +10,7 @@ import random
 import logging
 import telepot
 import telepot.aio
-from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardHide, ForceReply
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ForceReply
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import InlineQueryResultArticle, InlineQueryResultPhoto, InputTextMessageContent
 
@@ -105,15 +105,16 @@ class BggBot(telepot.aio.Bot):
             msg (str): The message to process.
         """
         def compute():
-            queryId, fromId, queryString = telepot.glance(msg, flavor='inline_query')
-
+            logger.debug("Computing inline")
+            queryId, fromId, queryString, offset = telepot.glance(msg, 'inline_query', True)
+            offset = int(offset) if offset else 0
             command, msgText = input_parser.parseInlineCommand(queryString.lower())
 
-            answer = request_manager.processInline(command, msgText, fromId)
+            answer = request_manager.processInline(command, msgText, fromId, offset)
             resultList = []
             for inlineAnswer in answer.answerList:
-                resultList.append(dict(type="article", title=inlineAnswer.title, id=inlineAnswer.id_, input_message_content=dict(message_text=inlineAnswer.formattedAnswer, parse_mode="Markdown"), thumb_url=inlineAnswer.thumbUrl))
-            return {"results": resultList, "cache_time": answer.cacheTime, "is_personal": answer.isPersonal}
+                resultList.append(dict(type="article", title=inlineAnswer.title, id=inlineAnswer.id_, input_message_content=dict(message_text=inlineAnswer.formattedAnswer, parse_mode="HTML"), thumb_url=inlineAnswer.thumbUrl))
+            return {"results": resultList, "cache_time": answer.cacheTime, "is_personal": answer.isPersonal, "next_offset": answer.nextOffset}
  
         self._answerer.answer(msg, compute)
 
@@ -151,8 +152,8 @@ class BggBot(telepot.aio.Bot):
         elif answer.inlineKeyboardMarkup is not None:
             markup = InlineKeyboardMarkup(inline_keyboard = answer.inlineKeyboardMarkup)
         else:
-            markup = ReplyKeyboardHide()
-        sentMessage = await self.sendMessage(chatId, answer.formattedAnswer, parse_mode="Markdown", reply_markup=markup, disable_web_page_preview=answer.disableWebPagePreview)
+            markup = None
+        sentMessage = await self.sendMessage(chatId, answer.formattedAnswer, parse_mode="HTML", reply_markup=markup, disable_web_page_preview=answer.disableWebPagePreview)
         history_manager.setMsgId(chatId, sentMessage["message_id"])
 
     async def sendCallbackAnswer(self, id_, answer):
@@ -175,7 +176,7 @@ class BggBot(telepot.aio.Bot):
         """
         msgId = (id_["chat_id"], id_["message_id"])
         markup = InlineKeyboardMarkup(inline_keyboard = answer.inlineKeyboardMarkup)
-        await self.editMessageText(msgId, answer.formattedAnswer, parse_mode="Markdown", reply_markup=markup, disable_web_page_preview=answer.disableWebPagePreview)
+        await self.editMessageText(msgId, answer.formattedAnswer, parse_mode="HTML", reply_markup=markup, disable_web_page_preview=answer.disableWebPagePreview)
 
     def sendInlineAnswer(self, id_, answer):
         pass # TODO implement or remove?
